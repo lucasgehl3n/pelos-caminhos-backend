@@ -1,11 +1,13 @@
 import { Model, DataTypes } from 'sequelize';
 import database from '../database';
+import UserRole from './UserRole';
 
 class User extends Model {
     public id!: number;
     public name?: string;
     public email!: string;
     public encriptedPassword!: string;
+    public userRoles!: UserRole[];
 }
 
 User.init(

@@ -2,6 +2,8 @@ import { Router } from "express";
 import passport from "passport";
 import { AuthenticatedRequest } from "..";
 import { Response, Request } from "express";
+import CheckUserPermission from "./middlewares/acl/CheckAclPermission";
+import { Roles } from "./enums/Roles";
 
 const routes = Router();
 routes.post(
@@ -16,9 +18,8 @@ routes.post(
     }
 );
 
-routes.get('/testingRoute', (req: Request, res: Response) => { 
-    const foo = req as unknown as AuthenticatedRequest;
-    return res.status(200).send(foo.user?.email);
-});
-
+routes.get('/testingRoute', CheckUserPermission(Roles.User), (req, res) => {
+    res.json({ message: 'Usuário encontrado!' });
+  });
+  
 export default routes;

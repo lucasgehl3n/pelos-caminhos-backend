@@ -9,7 +9,7 @@ import flash from 'connect-flash';
 import expressSession from 'express-session';
 import PassportManager from './middlewares/authentication/PassportManager';
 import AuthenticationValidator from './middlewares/authentication/AuthenticationValidator';
-
+import cors from 'cors';
 class Application {
     server: http.Server;
     express: express.Application;
@@ -19,13 +19,25 @@ class Application {
         this.server = http.createServer(this.express);
 
         this._setSession();
-        //this._setAclExpress();
         this._setMiddlewares();
         this._setRoutes();
         databaseSync();
     }
 
     private _setMiddlewares(): void {
+        this.express.use(cors({ origin: true, credentials: true }));
+
+        this.express.use(function (req: any, res: any, next) {
+            res.header('Access-Control-Allow-Credentials', true);
+            res.header('Access-Control-Allow-Origin', req.headers.origin);
+            res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
+            res.header('Access-Control-Allow-Headers', 'Origin, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version, X-Response-Time, X-PINGOTHER, X-CSRF-Token,Authorization');
+            if (req.method === "OPTIONS") {
+                return res.status(200).end();
+            } else {
+                next();
+            }
+        });
         this.express.use(express.json());
         this.express.use(bodyParser.urlencoded({ extended: true }));
         this.express.use(AuthenticationValidator);
@@ -48,23 +60,8 @@ class Application {
         this.express.use(flash())
         this.express.use(passport.initialize());
         this.express.use(passport.session());
-        PassportManager.InitAuthenticateMethods(); 
+        PassportManager.InitAuthenticateMethods();
     }
-
-    // private _setAclExpress(): void {
-    //     acl.config({
-    //         rules: aclRules,
-    //         baseUrl: '/',
-    //         decodedObjectName: 'user',
-    //         roleSearchPath: 'session.user.role',
-    //         defaultRole: Perfil[Perfil.deslogado],
-    //     });
-
-       
-    // }
-
-    
-
 }
 
 export default new Application().server;

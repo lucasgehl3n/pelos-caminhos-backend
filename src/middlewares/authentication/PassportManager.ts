@@ -30,8 +30,8 @@ export default class PassportManager {
     }
 
     static DeserializeUser() {
-        passport.deserializeUser(async (id: string, done) => {
-            const user = await UserService.GetById(id);
+        passport.deserializeUser(async (id: number, done) => {
+            const user = await UserService.GetByIdWithRoles(id);
             done(null, user);
         });
     }

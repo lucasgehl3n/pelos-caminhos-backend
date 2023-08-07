@@ -1,4 +1,5 @@
 import User from "../database/models/User";
+import UserRole from "../database/models/UserRole";
 import BaseService from "./BaseService";
 
 class UserService extends BaseService<User>{
@@ -10,7 +11,17 @@ class UserService extends BaseService<User>{
         return await User.findOne({
             where: {
                 email: email
-            }
+            },
+            include: 'userRoles'
+        });
+    }
+
+    static async GetByIdWithRoles(id: number) {
+        return await User.findOne({
+            where: {
+                id: id
+            },
+            include: 'userRoles'
         });
     }
 }
