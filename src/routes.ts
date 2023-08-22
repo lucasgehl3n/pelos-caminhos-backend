@@ -27,18 +27,14 @@ const upload = multer({ storage });
 routes.post('/institution/save',
     [
         upload.single('logo'),
-        CheckUserPermission(Roles.User)
     ],
     (req: Request, res: Response) => {
+        CheckUserPermission(Roles.User);
         return InstitutionController.save(req, res);
     });
 
-routes.get('/institution/:id', CheckUserPermission(Roles.User), (req, res) => {
+routes.get('/institution/:id', CheckUserPermission(Roles.Administrator), (req, res) => {
     return InstitutionController.detail(req, res);
-});
-
-routes.get('/testingRoute', CheckUserPermission(Roles.User), (req, res) => {
-    res.json({ message: 'Usuário encontrado!' });
 });
 
 export default routes;
