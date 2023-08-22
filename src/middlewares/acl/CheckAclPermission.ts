@@ -12,7 +12,7 @@ export default function CheckAclPermission(role: Roles) {
             return next();
         }
 
-        return res.status(403).json({ message: 'Perfil sem permissão!' });
+        return res.status(401).json({ message: 'Not allowed profile!' });
     }
 };
 

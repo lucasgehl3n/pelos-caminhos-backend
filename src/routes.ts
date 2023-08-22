@@ -4,6 +4,8 @@ import { AuthenticatedRequest } from "..";
 import { Response, Request } from "express";
 import CheckUserPermission from "./middlewares/acl/CheckAclPermission";
 import { Roles } from "./enums/Roles";
+import InstitutionController from "./controllers/InstitutionController";
+import multer from "multer";
 
 const routes = Router();
 routes.post(
@@ -18,8 +20,25 @@ routes.post(
     }
 );
 
+
+const storage = multer.memoryStorage();
+const upload = multer({ storage });
+
+routes.post('/institution/save',
+    [
+        upload.single('logo'),
+        CheckUserPermission(Roles.User)
+    ],
+    (req: Request, res: Response) => {
+        return InstitutionController.save(req, res);
+    });
+
+routes.get('/institution/:id', CheckUserPermission(Roles.User), (req, res) => {
+    return InstitutionController.detail(req, res);
+});
+
 routes.get('/testingRoute', CheckUserPermission(Roles.User), (req, res) => {
     res.json({ message: 'Usuário encontrado!' });
-  });
-  
+});
+
 export default routes;

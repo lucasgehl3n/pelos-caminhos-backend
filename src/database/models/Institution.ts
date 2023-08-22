@@ -1,16 +1,19 @@
 import { Model, DataTypes } from 'sequelize';
 import database from '../database';
-
+import multer from 'multer';
+import Address from './Address';
 class Institution extends Model {
     public id!: number;
     public name!: string;
-    public cnpj?: string;
+    public document?: string;
     public description!: string;
     public phone?: string;
     public site?: string;
     public email?: string;
-    public image?: string;
+    public image?: string | null;
     public receive_volunteers!: string;
+    public adress!: Address
+    public idAddress!: number
 }
 
 Institution.init(
@@ -24,7 +27,11 @@ Institution.init(
             type: DataTypes.STRING,
             allowNull: false,
         },
-        cnpj:{
+        document:{
+            type: DataTypes.STRING,
+            allowNull: true,
+        },
+        email:{
             type: DataTypes.STRING,
             allowNull: true,
         },

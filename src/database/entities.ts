@@ -1,3 +1,4 @@
+import Address from "./models/Address";
 import Animal from "./models/Animal";
 import Institution from "./models/Institution";
 import User from "./models/User";
@@ -7,4 +8,5 @@ export const entities: any[] = [
     Institution,
     UserRole,
     Animal,
+    Address,
 ]

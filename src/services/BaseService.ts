@@ -1,4 +1,4 @@
-import { Model, ModelStatic } from "sequelize";
+import { Model, ModelStatic, Transaction } from "sequelize";
 
 class BaseService<T extends Model> {
   private model: ModelStatic<T>;
@@ -12,7 +12,7 @@ class BaseService<T extends Model> {
     return await service.model.findByPk(id);
   }
 
-  static async Save<T extends Model>(this: new () => BaseService<T>, campos: Record<string, any>, buildOptions?: any | null, chaveComposta?: any) {
+  static async Save<T extends Model>(this: new () => BaseService<T>, campos: Record<string, any>, buildOptions?: any | null, chaveComposta?: any, transaction?: Transaction) {
     const service = new this();
     let entidade: any;
     if (chaveComposta)
@@ -22,10 +22,10 @@ class BaseService<T extends Model> {
       entidade = await service.model.findByPk(campos.id);
       
     if (entidade) {
-      await entidade.update(campos);
+      await entidade.update(campos, { transaction });
     } else {
       entidade = service.model.build(campos as T["_creationAttributes"], buildOptions);
-      await entidade.save();
+      await entidade.save({ transaction });
     }
     return entidade;
   }
