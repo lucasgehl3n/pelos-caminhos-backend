@@ -1,7 +1,6 @@
 
 import http from 'http';
 import express from "express";
-import bodyParser from 'body-parser';
 import routes from './routes';
 import passport from 'passport';
 import { databaseSync } from './database/sync';
@@ -39,7 +38,7 @@ class Application {
             }
         });
         this.express.use(express.json());
-        this.express.use(bodyParser.urlencoded({ extended: true }));
+        this.express.use(express.urlencoded({ extended: true }));
         this.express.use(AuthenticationValidator);
     }
 

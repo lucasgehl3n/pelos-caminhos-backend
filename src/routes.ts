@@ -1,4 +1,4 @@
-import { Router } from "express";
+import { NextFunction, Router } from "express";
 import passport from "passport";
 import { AuthenticatedRequest } from "..";
 import { Response, Request } from "express";
@@ -6,7 +6,6 @@ import CheckUserPermission from "./middlewares/acl/CheckAclPermission";
 import { Roles } from "./enums/Roles";
 import InstitutionController from "./controllers/InstitutionController";
 import multer from "multer";
-
 const routes = Router();
 routes.post(
     "/login",
@@ -21,13 +20,11 @@ routes.post(
 );
 
 
-const storage = multer.memoryStorage();
-const upload = multer({ storage });
 
+const storage = multer.memoryStorage()
+const upload = multer({ storage: storage })
 routes.post('/institution/save',
-    [
-        upload.single('logo'),
-    ],
+    upload.any(),
     (req: Request, res: Response) => {
         CheckUserPermission(Roles.User);
         return InstitutionController.save(req, res);

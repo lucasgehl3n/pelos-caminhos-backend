@@ -1,7 +1,7 @@
 import { Model, DataTypes } from 'sequelize';
 import database from '../database';
-import multer from 'multer';
 import Address from './Address';
+import InstitutionImage from './InstitutionImage';
 class Institution extends Model {
     public id!: number;
     public name!: string;
@@ -14,6 +14,7 @@ class Institution extends Model {
     public receive_volunteers!: string;
     public adress!: Address
     public idAddress!: number
+    public publicImages!: InstitutionImage[]
 }
 
 Institution.init(

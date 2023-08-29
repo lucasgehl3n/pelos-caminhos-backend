@@ -1,5 +1,4 @@
 import User from "../database/models/User";
-import UserRole from "../database/models/UserRole";
 import BaseService from "./BaseService";
 
 class UserService extends BaseService<User>{

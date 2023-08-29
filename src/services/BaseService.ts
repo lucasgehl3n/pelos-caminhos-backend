@@ -20,12 +20,17 @@ class BaseService<T extends Model> {
 
     else
       entidade = await service.model.findByPk(campos.id);
-      
+
     if (entidade) {
       await entidade.update(campos, { transaction });
     } else {
-      entidade = service.model.build(campos as T["_creationAttributes"], buildOptions);
-      await entidade.save({ transaction });
+      if(campos instanceof service.model){
+        await campos.save({ transaction });
+      }
+      else{
+        entidade = service.model.build(campos as T["_creationAttributes"], buildOptions);
+        await entidade.save({ transaction });
+      }
     }
     return entidade;
   }
@@ -40,6 +45,18 @@ class BaseService<T extends Model> {
     }
 
     return listInserts;
+  }
+
+  static async DeleteById<T extends Model>(this: new () => BaseService<T>, id: string, transaction?: Transaction) {
+    const service = new this();
+    const entityToDelete = await service.model.findByPk(id);
+    
+    if (entityToDelete) {
+      await entityToDelete.destroy({ transaction });
+      return true;
+    }
+
+    return false;
   }
 }
 

@@ -6,7 +6,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "npx tsc",
-    "dev": "nodemon --exec ts-node --files src/index.ts"
+    "dev": "nodemon --exec ts-node --files src/index.ts",
+    "debug": "nodemon --exec \"node --require ts-node/register --inspect src/index.ts\""
   },
   "keywords": [],
   "author": "Lucas Gehlen",
@@ -15,6 +16,7 @@
     "@types/bcryptjs": "^2.4.2",
     "@types/connect-flash": "^0.0.37",
     "@types/cors": "^2.8.13",
+    "@types/express-formidable": "^1.2.0",
     "@types/express-session": "^1.17.7",
     "@types/passport": "^1.0.12",
     "@types/passport-local": "^1.0.35",
@@ -26,6 +28,7 @@
     "cors": "^2.8.5",
     "dotenv": "^16.3.1",
     "express": "^4.18.2",
+    "express-form-data": "^2.0.22",
     "express-session": "^1.17.3",
     "mime-types": "^2.1.35",
     "multer": "^1.4.5-lts.1",
