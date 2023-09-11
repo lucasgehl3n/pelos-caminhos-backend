@@ -10,7 +10,7 @@ let options: Options = {
     password: process.env.DB_PASSWORD,
     database:process.env.DB_NAME,
     logging: false,
-    port: 5432,
+    port: process.env.DB_PORT ? parseInt(process.env.DB_PORT) : 0,
     define: {
         timestamps: true,
     }
