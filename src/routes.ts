@@ -6,6 +6,8 @@ import CheckUserPermission from "./middlewares/acl/CheckAclPermission";
 import { Roles } from "./enums/Roles";
 import InstitutionController from "./controllers/InstitutionController";
 import multer from "multer";
+import CityController from "./controllers/CityController";
+import UserController from "./controllers/UserController";
 const routes = Router();
 routes.post(
     "/login",
@@ -32,6 +34,18 @@ routes.post('/institution/save',
 
 routes.get('/institution/:id', CheckUserPermission(Roles.Administrator), (req, res) => {
     return InstitutionController.detail(req, res);
+});
+
+routes.get('/institution/', (req, res) => {
+    return InstitutionController.list(req, res);
+});
+
+routes.get('/cities/', (req, res) => {
+    return CityController.list(req, res);
+});
+
+routes.post('/create-account/save', upload.any(), (req, res) => {
+    return UserController.save(req, res)
 });
 
 export default routes;

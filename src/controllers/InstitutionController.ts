@@ -6,6 +6,11 @@ import { Response, Request } from "express";
 import InstitutionService from "../services/InstitutionService";
 import UserRoleService from "../services/UserRoleService";
 import InstitutionImageService from "../services/InstitutionImageService";
+import Constants from "../../constants";
+import InstitutionView from "../views/InstitutionView";
+import { Roles } from "../enums/Roles";
+import UserRole from "../database/models/UserRole";
+import InstitutionFilters from "../filters/InstitutionFilters";
 
 const _mapGalleryToData = (req: Request, images: Record<string, any>) => {
     const publicImages = images.filter(
@@ -30,7 +35,6 @@ const _mapRequestToData = async (req: Request) => {
     const data = req.body as unknown as Institution;
     const images = (req.files as Record<string, any>);
     const imagesConfig = _mapGalleryToData(req, images);
-
     data.publicImages = [...imagesConfig];
     data.adress = req.body.address as Address;
 
@@ -54,7 +58,10 @@ const _mapInstitutionImage = async (entity: Institution) => {
             entity.image = `data:image/png;base64,${image}`;
         }
     }
+    return entity;
+};
 
+const _mapPublicImages = async (entity: Institution) => {
     if (entity.publicImages) {
         await entity.publicImages.forEach(async (image: InstitutionImage) => {
             if (image.image) {
@@ -66,6 +73,21 @@ const _mapInstitutionImage = async (entity: Institution) => {
         });
     }
     return entity;
+};
+
+const _mapRolesSearch = async (entityView: Institution, userRoles: any, institutionViewList: Object[]) => {
+    if (userRoles.some((x: UserRole) =>
+        x.idInstitution == entityView.id,
+    )) {
+        const role = userRoles.find((x: UserRole) =>
+            x.idInstitution == entityView.id,
+        );
+
+        institutionViewList.push({ ...entityView.dataValues, role: role?.idRole as Roles });
+    }
+    else {
+        institutionViewList.push(entityView);
+    }
 };
 
 const _deletePublicImages = async (req: Request, res: Response) => {
@@ -91,6 +113,22 @@ const _deletePublicImages = async (req: Request, res: Response) => {
         };
     }
 };
+
+
+interface SortingOptions {
+    'name-az': string[][];
+    'name-za': string[][];
+    'latest': string[][];
+    'old': string[][];
+}
+
+const sortingOptions: SortingOptions = {
+    'name-az': [['name', 'ASC']],
+    'name-za': [['name', 'DESC']],
+    'latest': [['createdAt', 'DESC']],
+    'old': [['createdAt', 'ASC']],
+};
+
 class InstitutionController {
     public static async save(req: Request, res: Response) {
         await _deletePublicImages(req, res);
@@ -118,10 +156,64 @@ class InstitutionController {
 
             if (entity) {
                 entity = await _mapInstitutionImage(entity);
+                entity = await _mapPublicImages(entity);
                 return res.status(200).json(entity);
             }
 
             return res.status(404).json({});
+        }
+        catch (error) {
+            console.error(error);
+            return res.status(500).json(error).send();
+        }
+    }
+
+    public static async list(req: Request, res: Response) {
+        try {
+            const currentPage = req.query.page ? parseInt(req.query.page as string) : 0;
+            const offset = (currentPage - 1)
+                * Constants.resultsPerPage;
+
+
+            const sortingKey: keyof SortingOptions = 
+                req.query.sorting as keyof SortingOptions;
+
+            const sortingCriteria = sortingOptions[sortingKey] || sortingOptions['name-az'];;
+
+            let entities = await Institution.findAll({
+                ...InstitutionFilters.ApplyFilters(req),
+                offset: offset,
+                limit: Constants.resultsPerPage,
+                order: sortingCriteria,
+            });
+
+            const authenticatedRequest = req as unknown as AuthenticatedRequest;
+            const { userRoles } = authenticatedRequest.user!;
+
+            if (entities) {
+                const institutionViewList: Object[] = [];
+                for (let i = 0; i < entities.length; i++) {
+                    entities[i] = await _mapInstitutionImage(entities[i]);
+                    const entityView = entities[i];
+                    _mapRolesSearch(entityView, userRoles, institutionViewList);
+                }
+
+                const userId = authenticatedRequest.user!.id;
+                const countVolunteer = await InstitutionService.CountVolunteers(userId!);
+                const countAdmin = await InstitutionService.CountAdmin(userId!);
+                return res.status(200).json({
+                    list: [
+                        ...institutionViewList,
+                    ],
+                    counters: {
+                        volunteer: countVolunteer,
+                        admin: countAdmin,
+                        bounded: (countVolunteer || 0) + (countAdmin || 0),
+                    }
+                });
+            }
+
+            return res.status(404).json();
         }
         catch (error) {
             console.error(error);

@@ -2,7 +2,13 @@ import { NextFunction } from 'express';
 import { Request, Response } from 'express';
 
 export default function AuthenticationValidator(req: Request, res: Response, next: NextFunction) {
-  if (req.isAuthenticated() || req.path.includes('/login') || (req.path.includes('/usuario') && (req.method === "POST" || req.method === "PUT"))) {
+  const whiteListRoutes = [
+    '/login',
+    '/create-account',
+    '/cities',
+    '/create-account/save',
+  ]
+  if (req.isAuthenticated() || whiteListRoutes.includes(req.path)) {
     return next();
   }
   res.sendStatus(403);

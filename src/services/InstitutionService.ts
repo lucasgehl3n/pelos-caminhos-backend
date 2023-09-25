@@ -3,6 +3,9 @@ import AdressService from "./AdressService";
 import BaseService from "./BaseService";
 import database from '../database/database';
 import InstitutionImageService from "./InstitutionImageService";
+import UserRole from "../database/models/UserRole";
+import { Roles } from "../enums/Roles";
+import { Op } from "sequelize";
 
 class InstitutionService extends BaseService<Institution>{
     constructor() {
@@ -31,6 +34,34 @@ class InstitutionService extends BaseService<Institution>{
             await t.rollback();
             console.error('Error occurred during transaction:', error);
         }
+    }
+
+    static async CountVolunteers(idUser: number) {
+        return await Institution.count({
+            include: [
+                {
+                    model: UserRole,
+                    where: {
+                        idUser,
+                        idRole: Roles.Volunteer
+                    },
+                },
+            ],
+        })
+    }
+
+    static async CountAdmin(idUser: number) {
+        return await Institution.count({
+            include: [
+                {
+                    model: UserRole,
+                    where: {
+                        idUser,
+                        idRole: Roles.Administrator
+                    },
+                },
+            ],
+        })
     }
 }
 

@@ -3,7 +3,7 @@ import database from '../database';
 import Institution from './Institution';
 
 class Address extends Model {
-    public id!: number;
+    public id!: number | null;
     public street!: string;
     public number!: string;
     public cep!: string;

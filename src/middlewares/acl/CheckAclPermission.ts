@@ -5,6 +5,7 @@ import { Roles } from "../../enums/Roles";
 
 export default function CheckAclPermission(role: Roles) {
     return function (req: Request, res: Response, next: NextFunction) {
+        // return next();
         const authenticatedRequest = req as unknown as AuthenticatedRequest;
         const { userRoles } = authenticatedRequest.user!;
         const id = req.params.id || req.body.id;

@@ -2,8 +2,9 @@ import { Model, DataTypes } from 'sequelize';
 import database from '../database';
 import Address from './Address';
 import InstitutionImage from './InstitutionImage';
+
 class Institution extends Model {
-    public id!: number;
+    public id!: number | null;
     public name!: string;
     public document?: string;
     public description!: string;
