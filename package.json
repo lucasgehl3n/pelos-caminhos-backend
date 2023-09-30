@@ -3,18 +3,19 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
+  "engines": {
+    "node": "18"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "npx tsc",
+    "build": "tsup src",
     "dev": "nodemon --exec ts-node --files src/index.ts",
-    "debug": "nodemon --exec \"node --require ts-node/register --inspect src/index.ts\"",
-    "start": "netlify dev"
+    "debug": "nodemon --exec \"node --require ts-node/register --inspect src/index.ts\""
   },
   "keywords": [],
   "author": "Lucas Gehlen",
   "license": "ISC",
   "dependencies": {
-    "@netlify/functions": "^2.1.0",
     "@types/bcryptjs": "^2.4.2",
     "@types/connect-flash": "^0.0.37",
     "@types/cors": "^2.8.13",
@@ -50,6 +51,7 @@
     "sequelize": "^6.32.1",
     "sequelize-cli": "^6.6.1",
     "ts-node": "^10.9.1",
+    "tsup": "^7.2.0",
     "typescript": "^5.2.2"
   }
 }
