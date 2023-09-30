@@ -8,7 +8,7 @@ export default function AuthenticationValidator(req: Request, res: Response, nex
     '/cities',
     '/create-account/save',
   ]
-  if (req.isAuthenticated() || whiteListRoutes.includes(req.path)) {
+  if (req.isAuthenticated() || whiteListRoutes.includes(req.path) || req.path.startsWith('/public/')) {
     return next();
   }
   res.sendStatus(403);

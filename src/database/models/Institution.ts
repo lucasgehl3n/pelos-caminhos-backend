@@ -3,6 +3,7 @@ import database from '../database';
 import Address from './Address';
 import InstitutionImage from './InstitutionImage';
 
+import User from './User';
 class Institution extends Model {
     public id!: number | null;
     public name!: string;
@@ -16,6 +17,7 @@ class Institution extends Model {
     public adress!: Address
     public idAddress!: number
     public publicImages!: InstitutionImage[]
+    public idUserCreator!: number | null;
 }
 
 Institution.init(
@@ -29,34 +31,38 @@ Institution.init(
             type: DataTypes.STRING,
             allowNull: false,
         },
-        document:{
+        document: {
             type: DataTypes.STRING,
             allowNull: true,
         },
-        email:{
+        email: {
             type: DataTypes.STRING,
             allowNull: true,
         },
-        description:{
+        description: {
             type: DataTypes.STRING,
             allowNull: false,
         },
-        phone:{
+        phone: {
             type: DataTypes.STRING,
             allowNull: true,
         },
-        site:{
+        site: {
             type: DataTypes.STRING,
             allowNull: true,
         },
-        image:{
+        image: {
             type: DataTypes.BLOB,
             allowNull: true,
         },
-        receive_volunteers:{
+        receive_volunteers: {
             type: DataTypes.BOOLEAN,
             allowNull: false,
             defaultValue: true,
+        },
+        idUserCreator: {
+            type: DataTypes.INTEGER,
+            allowNull: true,
         },
     },
     {
@@ -65,4 +71,14 @@ Institution.init(
     }
 );
 
+
+Institution.belongsTo(User, {
+    foreignKey: 'idUserCreator', 
+    as: 'userCreator'
+});
+
+Institution.belongsTo(Address, {
+    foreignKey:'idAddress',
+    as: 'address',
+}); 
 export default Institution;

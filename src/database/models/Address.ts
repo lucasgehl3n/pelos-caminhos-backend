@@ -40,10 +40,7 @@ Address.init(
     }
 );
 
-Institution.belongsTo(Address, {
-    foreignKey:'idAddress',
-    as: 'address',
-}); 
+
 
 
 

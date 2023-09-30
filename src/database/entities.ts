@@ -11,6 +11,7 @@ import UserRole from "./models/UserRole";
 export const entities: any[] = [
     State,
     City,
+    Address,
     User,
     Interest,
     InterestCity,
@@ -18,5 +19,4 @@ export const entities: any[] = [
     InstitutionImage,
     UserRole,
     Animal,
-    Address,
 ]

@@ -38,11 +38,15 @@ const _mapRequestToData = async (req: Request) => {
     data.publicImages = [...imagesConfig];
     data.adress = req.body.address as Address;
 
-
     const logoImage = images.find(
         (file: Express.Multer.File) =>
             file.fieldname == 'logo'
     );
+    
+    if(!data.id) {
+        const authenticatedRequest = req as unknown as AuthenticatedRequest;
+        data.idUserCreator = authenticatedRequest.user!.id;
+    }
 
     if (logoImage) {
         data.image = logoImage.buffer?.toString('base64');
@@ -145,6 +149,37 @@ class InstitutionController {
         return res.status(200).send({});
     }
 
+    public static async publicDetail(req: Request, res: Response) {
+        try {
+            let entity = await Institution.findByPk(req.params.id, {
+                include: [
+                    'address',
+                    'publicImages',
+                ],
+                attributes: {
+                    exclude: [
+                        'receive_volunteers', 
+                        'idAddress', 
+                        'document',
+                        'idUserCreator'
+                    ]
+                }
+            });
+
+            if (entity) {
+                entity = await _mapInstitutionImage(entity);
+                entity = await _mapPublicImages(entity);
+                return res.status(200).json(entity);
+            }
+
+            return res.status(404).json({});
+        }
+        catch (error) {
+            console.error(error);
+            return res.status(500).json(error).send();
+        }
+    }
+
     public static async detail(req: Request, res: Response) {
         try {
             let entity = await Institution.findByPk(req.params.id, {
@@ -175,7 +210,7 @@ class InstitutionController {
                 * Constants.resultsPerPage;
 
 
-            const sortingKey: keyof SortingOptions = 
+            const sortingKey: keyof SortingOptions =
                 req.query.sorting as keyof SortingOptions;
 
             const sortingCriteria = sortingOptions[sortingKey] || sortingOptions['name-az'];;

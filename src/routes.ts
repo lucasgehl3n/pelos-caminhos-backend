@@ -36,6 +36,10 @@ routes.get('/institution/:id', CheckUserPermission(Roles.Administrator), (req, r
     return InstitutionController.detail(req, res);
 });
 
+routes.get('/public/institution/:id', (req, res) => {
+    return InstitutionController.publicDetail(req, res);
+});
+
 routes.get('/institution/', (req, res) => {
     return InstitutionController.list(req, res);
 });
