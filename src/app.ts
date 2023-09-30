@@ -57,6 +57,7 @@ class Application {
 
     private _setRoutes(): void {
         this.express.use(routes);
+        this.express.use('/netlify/functions/api', routes);
     }
 
     private _setSession(): void {
