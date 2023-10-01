@@ -8,6 +8,8 @@ export default function AuthenticationValidator(req: Request, res: Response, nex
     '/cities',
     '/create-account/save',
   ]
+  console.log('iSAuth', req.isAuthenticated());
+  console.log('whiteListRoutes', whiteListRoutes);
   if (req.isAuthenticated() || whiteListRoutes.includes(req.path) || req.path.startsWith('/public/')) {
     return next();
   }
