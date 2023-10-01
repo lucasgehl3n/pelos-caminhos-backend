@@ -9,6 +9,8 @@ import expressSession from 'express-session';
 import PassportManager from './middlewares/authentication/PassportManager';
 import AuthenticationValidator from './middlewares/authentication/AuthenticationValidator';
 import cors from 'cors';
+import RedisStore from "connect-redis";
+import { createClient } from 'redis';
 class Application {
     server: http.Server;
     express: express.Application;
@@ -25,17 +27,17 @@ class Application {
 
     private _setMiddlewares(): void {
         this.express.use(cors({
-            origin: process.env.FRONTEND_URL, 
+            origin: process.env.FRONTEND_URL,
             credentials: true,
             methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-            optionsSuccessStatus: 200 
+            optionsSuccessStatus: 200
         }));
-        
+
         this.express.use(cors({
-            origin: 'https://localhost:3000', 
+            origin: 'https://localhost:3000',
             credentials: true,
             methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-            optionsSuccessStatus: 200 
+            optionsSuccessStatus: 200
         }));
 
         this.express.use(function (req: any, res: any, next) {
@@ -43,7 +45,7 @@ class Application {
             res.header('Access-Control-Allow-Origin', req.headers.origin);
             res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
             res.header('Access-Control-Allow-Headers', 'Origin, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version, X-Response-Time, X-PINGOTHER, X-CSRF-Token,Authorization');
-            
+
             if (req.method === "OPTIONS") {
                 return res.status(200).end();
             } else {
@@ -59,14 +61,27 @@ class Application {
         this.express.use(routes);
     }
 
-    private _setSession(): void {
+    private async _setSession(): Promise<void> {
+        let redisClient = createClient({
+            url: process.env.REDIS_URL,
+        });
+        redisClient.connect();
+        redisClient.on("error", function (error) {
+            console.error("Error in Redis client: " + error);
+        });
+
+        redisClient.flushDb();
+
+        const sessionStore = new RedisStore({ client: redisClient });
+
         this.express.use(expressSession({
+            store: sessionStore,
             secret: 'xkACzfyIvmx8wEL?-Z9652ub?h61Ozu5/ag13mzSaXzuv--8EfCwUDTqT8QGtZGgYqzDcWguh8qqqGiQWqxMTx98PmRBFIk7CuuEos!JQ7N=vdhnl5jY9N6K20oQtbynxrvLhyBB7CACN99!xb7cQwt3MkMODuz=D!cryE?va5J-Htq=z5ZTYM3B8xbQxQyVsNHAZBWOjbBKW3wZSGyjOhu/cV-zLFyFhnSmLKY2Dter//Fe9nJ9cBJJVRTjW/pN',
             resave: false,
             saveUninitialized: false,
             cookie: {
                 maxAge: 60 * 60 * 24,
-                domain: process.env.NODE_ENV === 'production' ?  process.env.COOKIE_PUBLIC_DOMAIN : 'localhost',
+                domain: process.env.NODE_ENV === 'production' ? process.env.COOKIE_PUBLIC_DOMAIN : 'localhost',
             },
         }));
 
