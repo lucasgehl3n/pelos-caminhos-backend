@@ -10,7 +10,8 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "tsup src",
     "dev": "nodemon --exec ts-node --files src/index.ts",
-    "debug": "nodemon --exec \"node --require ts-node/register --inspect src/index.ts\""
+    "debug": "nodemon --exec \"node --require ts-node/register --inspect src/index.ts\"",
+    "start": "node dist/index.js"
   },
   "keywords": [],
   "author": "Lucas Gehlen",
