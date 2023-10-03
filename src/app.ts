@@ -62,20 +62,22 @@ class Application {
     }
 
     private async _setSession(): Promise<void> {
-        let redisClient = createClient({
-            url: process.env.REDIS_URL,
-        });
-        redisClient.connect();
-        redisClient.on("error", function (error) {
-            console.error("Error in Redis client: " + error);
-        });
+        const addedSessionStore: any = {};
+        if (process.env.REDIS_URL) {
+            let redisClient = createClient({
+                url: process.env.REDIS_URL,
+            });
+            redisClient.connect();
+            redisClient.on("error", function (error) {
+                console.error("Error in Redis client: " + error);
+            });
 
-        redisClient.flushDb();
+            redisClient.flushDb();
 
-        const sessionStore = new RedisStore({ client: redisClient });
-
+            addedSessionStore.store = new RedisStore({ client: redisClient });
+        }
         this.express.use(expressSession({
-            store: sessionStore,
+            ...addedSessionStore,
             secret: 'xkACzfyIvmx8wEL?-Z9652ub?h61Ozu5/ag13mzSaXzuv--8EfCwUDTqT8QGtZGgYqzDcWguh8qqqGiQWqxMTx98PmRBFIk7CuuEos!JQ7N=vdhnl5jY9N6K20oQtbynxrvLhyBB7CACN99!xb7cQwt3MkMODuz=D!cryE?va5J-Htq=z5ZTYM3B8xbQxQyVsNHAZBWOjbBKW3wZSGyjOhu/cV-zLFyFhnSmLKY2Dter//Fe9nJ9cBJJVRTjW/pN',
             resave: false,
             saveUninitialized: false,
