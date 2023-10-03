@@ -5,7 +5,7 @@ class Database {
     connection!: Sequelize.Sequelize;
 
     constructor() {
-        const connString = process.env.DATABASE_URL || "";
+        const connString = process.env._DATABASE_URL || "";
 
         if (process.env.NODE_ENV === 'production') {
             this.connection = new Sequelize.Sequelize(connString, options);
