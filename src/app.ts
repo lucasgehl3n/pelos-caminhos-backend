@@ -26,20 +26,22 @@ class Application {
     }
 
     private _setMiddlewares(): void {
-        this.express.use(cors({
-            origin: process.env._FRONTEND_URL,
-            credentials: true,
-            methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-            optionsSuccessStatus: 200
-        }));
-
-        this.express.use(cors({
-            origin: 'https://localhost:3000',
-            credentials: true,
-            methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-            optionsSuccessStatus: 200
-        }));
-
+        if (process.env.NODE_ENV === 'production') {
+            this.express.use(cors({
+                origin: process.env.FRONTEND_URL,
+                credentials: true,
+                methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+                optionsSuccessStatus: 200
+            }));
+        }
+        else {
+            this.express.use(cors({
+                origin: 'https://localhost:3000',
+                credentials: true,
+                methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+                optionsSuccessStatus: 200
+            }));
+        }
         this.express.use(function (req: any, res: any, next) {
             res.header('Access-Control-Allow-Credentials', true);
             res.header('Access-Control-Allow-Origin', req.headers.origin);
@@ -83,7 +85,7 @@ class Application {
             saveUninitialized: false,
             cookie: {
                 maxAge: 60 * 60 * 24,
-                domain: process.env._NODE_ENV === 'production' ? process.env.COOKIE_PUBLIC_DOMAIN : 'localhost',
+                domain: process.env.NODE_ENV === 'production' ? process.env.COOKIE_PUBLIC_DOMAIN : 'localhost',
             },
         }));
 

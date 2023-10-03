@@ -22,7 +22,7 @@ let prodOptions = {
 
 
 const getOptions = () => {
-    if (process.env._NODE_ENV === 'production') {
+    if (process.env.NODE_ENV === 'production') {
         return prodOptions;
     }
     return devOptions;
