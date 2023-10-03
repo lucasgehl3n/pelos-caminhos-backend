@@ -81,7 +81,7 @@ class Application {
             saveUninitialized: false,
             cookie: {
                 maxAge: 60 * 60 * 24,
-                domain: process.env.NODE_ENV === 'production' ? process.env.COOKIE_PUBLIC_DOMAIN : 'localhost',
+                domain: process.env._NODE_ENV === 'production' ? process.env.COOKIE_PUBLIC_DOMAIN : 'localhost',
             },
         }));
 
