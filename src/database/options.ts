@@ -35,7 +35,10 @@ let options: Options = {
     port: process.env.DB_PORT ? parseInt(process.env.DB_PORT) : 0,
     define: {
         timestamps: true,
-    }
+    },
+    dialectOptions: {
+        ssl: false, // Configuração para desativar SSL
+    },
 }
 
 export default options;
