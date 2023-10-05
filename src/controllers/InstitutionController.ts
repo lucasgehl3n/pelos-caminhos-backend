@@ -42,8 +42,8 @@ const _mapRequestToData = async (req: Request) => {
         (file: Express.Multer.File) =>
             file.fieldname == 'logo'
     );
-    
-    if(!data.id) {
+
+    if (!data.id) {
         const authenticatedRequest = req as unknown as AuthenticatedRequest;
         data.idUserCreator = authenticatedRequest.user!.id;
     }
@@ -135,19 +135,25 @@ const sortingOptions: SortingOptions = {
 
 class InstitutionController {
     public static async save(req: Request, res: Response) {
-        await _deletePublicImages(req, res);
-        const data = await _mapRequestToData(req);
-        const authenticatedRequest = req as unknown as AuthenticatedRequest;
-        const shouldGenerateUserService = !data.id;
+        try {
+            await _deletePublicImages(req, res);
+            const data = await _mapRequestToData(req);
+            const authenticatedRequest = req as unknown as AuthenticatedRequest;
+            const shouldGenerateUserService = !data.id;
 
-        await InstitutionService.SaveWithDependences(data);
+            await InstitutionService.SaveWithDependences(data);
 
-        if (shouldGenerateUserService) {
-            console.log(authenticatedRequest.user)
-            UserRoleService.GenerateUserServiceToInstitution(authenticatedRequest.user!, data);
+            if (shouldGenerateUserService) {
+                console.log(authenticatedRequest.user)
+                UserRoleService.GenerateUserServiceToInstitution(authenticatedRequest.user!, data);
+            }
+
+            return res.status(200).send({});
         }
-
-        return res.status(200).send({});
+        catch (error) {
+            console.error(error);
+            return res.status(500).json(error).send();
+        }
     }
 
     public static async publicDetail(req: Request, res: Response) {
@@ -159,8 +165,8 @@ class InstitutionController {
                 ],
                 attributes: {
                     exclude: [
-                        'receive_volunteers', 
-                        'idAddress', 
+                        'receive_volunteers',
+                        'idAddress',
                         'document',
                         'idUserCreator'
                     ]
