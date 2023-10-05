@@ -18,6 +18,7 @@ class UserRoleService extends BaseService<UserRole>{
         };
 
         try {
+            console.log(userRole)
             const userRoleEntity = await super.Save(userRole);
             user.userRoles.push(userRoleEntity);
         }
