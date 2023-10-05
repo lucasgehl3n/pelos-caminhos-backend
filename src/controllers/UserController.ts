@@ -64,7 +64,13 @@ const _mapRequestToData = async (req: Request) => {
 
 export default class UserController {
     public static async save(req: Request, res: Response) {
-        const map = await _mapRequestToData(req);
-        await UserService.SaveWithDependences(map);
+        try {
+            const map = await _mapRequestToData(req);
+            await UserService.SaveWithDependences(map);
+            return res.status(200).send({});
+        } catch (error) {
+            console.error(error);
+            return res.status(500).json(error).send();
+        }
     }
 }
