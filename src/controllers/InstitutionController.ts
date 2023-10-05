@@ -143,6 +143,7 @@ class InstitutionController {
         await InstitutionService.SaveWithDependences(data);
 
         if (shouldGenerateUserService) {
+            console.log(authenticatedRequest.user)
             UserRoleService.GenerateUserServiceToInstitution(authenticatedRequest.user!, data);
         }
 
