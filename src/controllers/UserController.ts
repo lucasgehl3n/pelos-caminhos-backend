@@ -6,6 +6,7 @@ import UserService from '../services/UserService';
 import BCrypt from 'bcryptjs';
 import moment from 'moment';
 import Interest from '../database/models/Interest';
+import { Op } from 'sequelize';
 const _mapCitiesToData = (req: Request) => {
     const formData = req.body;
 
@@ -44,7 +45,8 @@ const _mapInterestsToData = (req: Request) => {
 const _mapRequestToData = async (req: Request) => {
     const data = req.body as unknown as User;
     const imageLogo = (req.files as Record<string, any>);
-    data.profileImage = imageLogo.buffer?.toString('base64');
+    if (imageLogo && imageLogo.length > 0)
+        data.profileImage = imageLogo[0].buffer?.toString('base64');
     data.address = req.body.address as Address;
     data.address.id = null
 
@@ -62,13 +64,56 @@ const _mapRequestToData = async (req: Request) => {
     return data;
 }
 
+const _getSearchFilters = (req: Request) => {
+    const search = req.query.search || "";
+    return {
+        where: {
+            ...(search && {
+                [Op.or]: [
+                    {
+                        name: {
+                            [Op.iLike]: `%${search}%`
+                        }
+                    },
+                    {
+                        email: {
+                            [Op.iLike]: `%${search}%`
+                        }
+                    },
+                    {
+                        phone: {
+                            [Op.iLike]: `%${search}%`
+                        }
+                    },
+                ],
+            }),
+        },
+    }
+};
+
 export default class UserController {
     public static async save(req: Request, res: Response) {
         try {
             const map = await _mapRequestToData(req);
-            await UserService.SaveWithDependences(map);
-            return res.status(200).send({});
+            const user = await UserService.SaveWithDependences(map);
+            return res.status(200).send({ id: user.id });
         } catch (error) {
+            console.error(error);
+            return res.status(500).json(error).send();
+        }
+    }
+
+    public static async list(req: Request, res: Response) {
+        try {
+            const searchFilter = _getSearchFilters(req) as any;
+            const entities = await User.findAll({
+                ...searchFilter,
+                limit: 50,
+                attributes: ['name', 'profileImage', 'id', 'email', 'phone'],
+            });
+            res.status(200).json(entities);
+        }
+        catch (error) {
             console.error(error);
             return res.status(500).json(error).send();
         }

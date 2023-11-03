@@ -15,6 +15,7 @@ class InstitutionService extends BaseService<Institution>{
     static async SaveWithDependences(institution: Institution) {
         const t = await database.connection.transaction();
         try {
+            console.log(institution.name)
             if (institution.adress) {
                 const address = await AdressService.Save(institution.adress, t);
                 institution.idAddress = address?.id;
@@ -27,8 +28,9 @@ class InstitutionService extends BaseService<Institution>{
                 }
             }
 
-            await super.Save(institution, t);
+            institution = await super.Save(institution, t);
             await t.commit();
+            return institution;
         }
         catch (error) {
             await t.rollback();

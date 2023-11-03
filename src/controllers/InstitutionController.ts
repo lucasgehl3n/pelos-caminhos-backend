@@ -7,10 +7,10 @@ import InstitutionService from "../services/InstitutionService";
 import UserRoleService from "../services/UserRoleService";
 import InstitutionImageService from "../services/InstitutionImageService";
 import Constants from "../../constants";
-import InstitutionView from "../views/InstitutionView";
 import { Roles } from "../enums/Roles";
 import UserRole from "../database/models/UserRole";
 import InstitutionFilters from "../filters/InstitutionFilters";
+import { Op } from "sequelize";
 
 const _mapGalleryToData = (req: Request, images: Record<string, any>) => {
     const publicImages = images.filter(
@@ -141,14 +141,12 @@ class InstitutionController {
             const authenticatedRequest = req as unknown as AuthenticatedRequest;
             const shouldGenerateUserService = !data.id;
 
-            await InstitutionService.SaveWithDependences(data);
-
+            const institution = await InstitutionService.SaveWithDependences(data);
             if (shouldGenerateUserService) {
-                console.log(authenticatedRequest.user)
                 UserRoleService.GenerateUserServiceToInstitution(authenticatedRequest.user!, data);
             }
 
-            return res.status(200).send({});
+            return res.status(200).send({ id: institution?.id});
         }
         catch (error) {
             console.error(error);
@@ -261,6 +259,35 @@ class InstitutionController {
             console.error(error);
             return res.status(500).json(error).send();
         }
+    }
+
+    public static async ListInstitutionsWithRoles(req: Request, res: Response) {
+        const authenticatedRequest = req as unknown as AuthenticatedRequest;
+        const { userRoles } = authenticatedRequest.user!;
+        let roles = userRoles.filter((x: UserRole) =>
+            x.idRole == Roles.Administrator || x.idRole == Roles.Volunteer
+        );
+
+        let listInstitutions = [];
+        for (let i = 0; i < roles.length; i++) {
+            listInstitutions.push(roles[i].idInstitution);
+        }
+
+        const institutions = await Institution.findAll({
+            where: {
+                id: {
+                    [Op.in]: listInstitutions,
+                },
+
+            },
+            attributes: ['id', 'name', 'image'],
+        });
+
+        for (let i = 0; i < institutions.length; i++) {
+            institutions[i] = await _mapInstitutionImage(institutions[i]);
+        }
+
+        return res.status(200).json(institutions);
     }
 }
 

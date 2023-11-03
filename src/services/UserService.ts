@@ -34,6 +34,7 @@ class UserService extends BaseService<User>{
                 }
             }
             await t.commit();
+            return userSaved;
         }
         catch (error) {
             await t.rollback();
