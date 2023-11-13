@@ -9,8 +9,6 @@ import expressSession from 'express-session';
 import PassportManager from './middlewares/authentication/PassportManager';
 import AuthenticationValidator from './middlewares/authentication/AuthenticationValidator';
 import cors from 'cors';
-import RedisStore from "connect-redis";
-import { createClient } from 'redis';
 class Application {
     server: http.Server;
     express: express.Application;
@@ -26,22 +24,13 @@ class Application {
     }
 
     private _setMiddlewares(): void {
-        // if (process.env.NODE_ENV === 'production') {
-        //     this.express.use(cors({
-        //         origin: process.env.FRONTEND_URL,
-        //         credentials: true,
-        //         methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-        //         optionsSuccessStatus: 200
-        //     }));
-        // }
-        // else {
-            this.express.use(cors({
-                origin: 'http://localhost:3000',
-                credentials: true,
-                methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-                optionsSuccessStatus: 200
-            }));
-        // }
+        this.express.use(cors({
+            origin: process.env.FRONTEND_URL,
+            credentials: true,
+            methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+            optionsSuccessStatus: 200
+        }));
+
         this.express.use(function (req: any, res: any, next) {
             res.header('Access-Control-Allow-Credentials', true);
             res.header('Access-Control-Allow-Origin', req.headers.origin);
@@ -65,19 +54,6 @@ class Application {
 
     private async _setSession(): Promise<void> {
         const addedSessionStore: any = {};
-        if (process.env.REDIS_URL) {
-            let redisClient = createClient({
-                url: process.env.REDIS_URL,
-            });
-            redisClient.connect();
-            redisClient.on("error", function (error) {
-                console.error("Error in Redis client: " + error);
-            });
-
-            redisClient.flushDb();
-
-            addedSessionStore.store = new RedisStore({ client: redisClient });
-        }
         this.express.use(expressSession({
             ...addedSessionStore,
             secret: 'xkACzfyIvmx8wEL?-Z9652ub?h61Ozu5/ag13mzSaXzuv--8EfCwUDTqT8QGtZGgYqzDcWguh8qqqGiQWqxMTx98PmRBFIk7CuuEos!JQ7N=vdhnl5jY9N6K20oQtbynxrvLhyBB7CACN99!xb7cQwt3MkMODuz=D!cryE?va5J-Htq=z5ZTYM3B8xbQxQyVsNHAZBWOjbBKW3wZSGyjOhu/cV-zLFyFhnSmLKY2Dter//Fe9nJ9cBJJVRTjW/pN',

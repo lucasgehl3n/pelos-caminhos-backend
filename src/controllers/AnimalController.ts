@@ -11,6 +11,7 @@ import AnimalAttachmentService from "../services/AnimalAttachmentService";
 import Constants from "../../constants";
 import AnimalFilters from "../filters/AnimalFilters";
 import AnimalPredictionService from "../services/AnimalPredictionService";
+import { Species } from "../enums/Species";
 const _mapRequestToData = async (req: Request) => {
     let data = req.body as unknown as Animal;
     data = mapData(data);
@@ -225,18 +226,20 @@ export default class AnimalController {
                 const animalSaved = await AnimalService.SaveWithDependences(animal, transaction);
                 if (animalSaved?.id || animalSaved?.id === 0) {
                     if (animal.animalImages && animal.animalImages.length > 0) {
-                        let i = 0;
-                        const listImages = [];
-                        for (const image of animal.animalImages) {
-                            if (i > 10)
-                                break;
-                            const buffer = Buffer.from(image.image);
-                            const blob = new Blob([buffer], { type: image.type });
-                            listImages.push(blob);
-                            i++;
+                        if (animal.species == Species.Dog) {
+                            let i = 0;
+                            const listImages = [];
+                            for (const image of animal.animalImages) {
+                                if (i > 10)
+                                    break;
+                                const buffer = Buffer.from(image.image);
+                                const blob = new Blob([buffer], { type: image.type });
+                                listImages.push(blob);
+                                i++;
+                            }
+                            await AnimalPredictionService
+                                .generateAnimalPrediction(listImages, animal.id);
                         }
-                        await AnimalPredictionService
-                            .generateAnimalPrediction(listImages, animal.id);
                     }
                 }
             }
@@ -293,7 +296,7 @@ export default class AnimalController {
                         model: AnimalImage,
                         as: 'animalImages',
                         separate: true,
-                        limit: 1, 
+                        limit: 1,
                     },
                 ],
                 ...AnimalFilters.ApplyFilters(req),
@@ -340,7 +343,7 @@ export default class AnimalController {
 
             const filters = req.body.filters;
             const page = req.body.page;
-            
+
             const prediction = await AnimalPredictionService.getAnimalPredictionsOnSearch(blob);
             if (prediction) {
                 for (const entities of prediction) {

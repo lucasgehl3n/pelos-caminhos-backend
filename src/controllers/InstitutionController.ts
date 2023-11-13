@@ -142,8 +142,8 @@ class InstitutionController {
             const shouldGenerateUserService = !data.id;
 
             const institution = await InstitutionService.SaveWithDependences(data);
-            if (shouldGenerateUserService) {
-                UserRoleService.GenerateUserServiceToInstitution(authenticatedRequest.user!, data);
+            if (shouldGenerateUserService && institution) {
+                UserRoleService.GenerateUserServiceToInstitution(authenticatedRequest.user!, institution);
             }
 
             return res.status(200).send({ id: institution?.id});

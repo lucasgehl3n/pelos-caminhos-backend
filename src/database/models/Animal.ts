@@ -21,6 +21,7 @@ class Animal extends Model {
     public weight!: number;
     public deathDate!: Date;
     public deathDetail!: string;
+    public idBreed!: number;
     public adoptionDate!: Date;
     public adoptionUser!: User;
     public adoptionSolictationDate!: Date;

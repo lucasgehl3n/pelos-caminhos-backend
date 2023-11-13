@@ -19,10 +19,11 @@ class AnimalPredictionService extends BaseService<AnimalPrediction>{
         let listAnimals: number[] = [];
         if (predictionViewList && predictionViewList.length > 0) {
             for (let i = 0; i < predictionViewList.length; i++) {
-                if(predictionViewList[i].prob < 0.2) continue;
+                if (predictionViewList[i].prob < 0.2) continue;
                 const breed = await BreedService.getBreedByAITag(predictionViewList[i].breed);
                 if (breed && breed.id) {
-                    const animals = await this.GetAnimalsByBreedPrediction(breed.id);
+                    let animals = await this.GetAnimalsByBreedPrediction(breed.id);
+                    animals = animals.filter(x => x.predictions.find(x => x.idBreed == breed.id)?.percentage || 0 > 0.15);
                     const view = new AnimalView();
                     view.breed = breed;
                     view.animalList = animals.filter(x => !listAnimals.includes(x.id));
@@ -54,6 +55,16 @@ class AnimalPredictionService extends BaseService<AnimalPrediction>{
         return animals;
     }
 
+    static async deleteCurrentPredictions(idAnimal: number) {
+        const predictions = await AnimalPrediction.findAll({
+            where: {
+                idAnimal: idAnimal
+            }
+        });
+        for (let i = 0; i < predictions.length; i++) {
+            await predictions[i].destroy();
+        }
+    }
     static async generateAnimalPrediction(images: Blob[], idAnimal: number) {
         let listPredictions: AnimalPredictionView[] = [];
 
@@ -84,6 +95,8 @@ class AnimalPredictionService extends BaseService<AnimalPrediction>{
         const sizeSlice = finalListPredictions.length > 5 ? 5 : finalListPredictions.length;
         finalListPredictions = finalListPredictions.slice(0, sizeSlice);
 
+
+        this.deleteCurrentPredictions(idAnimal);
         let listAnimalPredictions: AnimalPrediction[] = [];
         for (let i = 0; i < finalListPredictions.length; i++) {
             const breed = await BreedService.getBreedByAITag(finalListPredictions[i].breed);

@@ -3,7 +3,6 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-
 let devOptions = {
     host: process.env.DB_HOST,
     username: process.env.DB_USER,
@@ -14,8 +13,8 @@ let devOptions = {
 let prodOptions = {
     dialectOptions: {
         ssl: {
-            require: true, // Requer SSL
-            rejectUnauthorized: false // Desativa a verificação do certificado SSL (use apenas em ambientes de desenvolvimento)
+            require: true, 
+            rejectUnauthorized: false 
         }
     }
 };

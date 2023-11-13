@@ -4,6 +4,7 @@ import { AuthenticatedRequest } from "../..";
 import { Op } from "sequelize";
 import Institution from "../database/models/Institution";
 import AnimalImage from "../database/models/AnimalImage";
+import { Species } from "../enums/Species";
 
 const _bondedFilters = (userRoles: UserRole[], searchFilter: any) => {
     return {
@@ -67,7 +68,7 @@ export default class AnimalFilters {
         }
 
 
-        const specie = req.query.dog ? 1 : req.query.cat ? 2 : null;
+        const specie = req.query.dog ? Species.Dog : req.query.cat ? Species.Cat : null;
         if (specie) {
             searchFilter = _specieFilter(specie, searchFilter);
         }
