@@ -7,18 +7,18 @@ export default class PassportManager {
         passport.use(new LocalStrategy({
             usernameField: 'email',
             passwordField: 'password'
-          }, async (email, password, done) => {
+        }, async (email, password, done) => {
             const user = await UserService.GetByEmail(email);
-            if(user){
-                // bcrypt.compare(password, user.encriptedPassword, (err, res) => {
-                //     if (res || err) {
-                      this.SerializeUser();
-                      this.DeserializeUser();
-                      done(null, user);
-                //     } else {
-                //       return done(null, false, { message: 'Credenciais inválidas!' });
-                //     }
-                //   });
+            if (user) {
+                bcrypt.compare(password, user.encriptedPassword, (err, res) => {
+                    // if (res || err) {
+                        this.SerializeUser();
+                        this.DeserializeUser();
+                        done(null, user);
+                    // } else {
+                    //     return done(null, false, { message: 'Credenciais inválidas!' });
+                    // }
+                });
             }
         }));
     }

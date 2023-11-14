@@ -44,6 +44,7 @@ const _mapRequestToData = async (req: Request) => {
     );
 
     if (!data.id) {
+        data.id = null;
         const authenticatedRequest = req as unknown as AuthenticatedRequest;
         data.idUserCreator = authenticatedRequest.user!.id;
     }
