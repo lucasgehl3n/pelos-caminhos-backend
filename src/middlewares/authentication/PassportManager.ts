@@ -11,13 +11,13 @@ export default class PassportManager {
             const user = await UserService.GetByEmail(email);
             if (user) {
                 bcrypt.compare(password, user.encriptedPassword, (err, res) => {
-                    // if (res || err) {
+                    if (res || err) {
                         this.SerializeUser();
                         this.DeserializeUser();
                         done(null, user);
-                    // } else {
-                    //     return done(null, false, { message: 'Credenciais inválidas!' });
-                    // }
+                    } else {
+                        return done(null, false, { message: 'Credenciais inválidas!' });
+                    }
                 });
             }
         }));
