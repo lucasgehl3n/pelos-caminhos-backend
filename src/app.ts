@@ -25,7 +25,7 @@ class Application {
 
     private _setMiddlewares(): void {
         this.express.use(cors({
-            origin: process.env.FRONTEND_URL,
+            origin: '*',
             credentials: true,
             methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
             optionsSuccessStatus: 200
