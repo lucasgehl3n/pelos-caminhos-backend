@@ -26,7 +26,6 @@ class Application {
     private _setMiddlewares(): void {
         this.express.use(cors({
             origin: '*',
-            credentials: true,
             methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
             optionsSuccessStatus: 200
         }));
