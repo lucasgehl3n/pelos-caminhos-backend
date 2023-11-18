@@ -81,6 +81,10 @@ routes.get('/user/', (req, res) => {
     return UserController.list(req, res)
 });
 
+routes.get('/detailUser/', (req, res) => {
+    return UserController.detailLoggedUser(req, res)
+});
+
 routes.get('/colors', (req, res) => {
     return ColorController.list(req, res)
 });
@@ -109,10 +113,11 @@ routes.get('/animal/', (req, res) => {
     return AnimalController.list(req, res)
 });
 
+routes.get('/public/animal/:id', (req, res) => {
+    return AnimalController.publicDetail(req, res);
+});
 
 routes.post('/animal/prediction', upload.single('image'), (req, res) => {
     return AnimalController.PredictionImage(req, res)
 });
-
-
 export default routes;

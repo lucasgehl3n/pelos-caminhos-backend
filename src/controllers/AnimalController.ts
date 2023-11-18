@@ -12,6 +12,13 @@ import Constants from "../../constants";
 import AnimalFilters from "../filters/AnimalFilters";
 import AnimalPredictionService from "../services/AnimalPredictionService";
 import { Species } from "../enums/Species";
+import Breed from "../database/models/Breed";
+import Institution from "../database/models/Institution";
+import User from "../database/models/User";
+import Color from "../database/models/Color";
+import BehavioralProfile from "../database/models/BehavioralProfile";
+import UserRole from "../database/models/UserRole";
+import { Roles } from "../enums/Roles";
 const _mapRequestToData = async (req: Request) => {
     let data = req.body as unknown as Animal;
     data = mapData(data);
@@ -136,6 +143,20 @@ const _mapAnimalFiles = async (entity: Animal) => {
 };
 
 
+const _mapRolesSearch = async (entityView: Animal, userRoles: any, animalViewList: Object[]) => {
+    if (userRoles.some((x: UserRole) =>
+        x.idInstitution == entityView.idInstitution,
+    )) {
+        const role = userRoles.find((x: UserRole) =>
+            x.idInstitution == entityView.idInstitution,
+        );
+
+        animalViewList.push({ ...entityView.dataValues, role: role?.idRole as Roles });
+    }
+    else {
+        animalViewList.push(entityView);
+    }
+};
 
 interface SortingOptions {
     'name-az': string[][];
@@ -298,27 +319,36 @@ export default class AnimalController {
                         separate: true,
                         limit: 1,
                     },
+                    {
+                        model: Institution,
+                        as: 'institution',
+                        attributes: ['name'],
+                    },
                 ],
                 ...AnimalFilters.ApplyFilters(req),
                 offset: offset,
-                attributes: ['id', 'name', 'age', 'gender', 'size'],
+                attributes: ['id', 'name', 'age', 'gender', 'size', 'idInstitution'],
                 limit: Constants.resultsPerPage,
                 order: sortingCriteria,
             });
 
             if (entities) {
-                const institutionViewList: Object[] = [];
+                const authenticatedRequest = req as unknown as AuthenticatedRequest;
+                const { userRoles } = authenticatedRequest.user!;
+
+                const viewList: Object[] = [];
                 for (let i = 0; i < entities.length; i++) {
                     if (entities[i].animalImages && entities[i].animalImages.length > 0) {
                         entities[i].animalImages = [entities[i].animalImages[0]];
                         entities[i] = await _mapAnimalImages(entities[i]);
                     }
-                    institutionViewList.push(entities[i])
+                    const entityView = entities[i];
+                    _mapRolesSearch(entityView, userRoles, viewList);
                 }
 
                 return res.status(200).json({
                     list: [
-                        ...institutionViewList,
+                        ...viewList,
                     ],
                 });
             }
@@ -358,6 +388,61 @@ export default class AnimalController {
                 }
             }
             return res.status(200).json(prediction);
+        }
+        catch (error) {
+            console.error(error);
+            return res.status(500).json(error).send();
+        }
+    }
+
+    public static async publicDetail(req: Request, res: Response) {
+        try {
+            let entity = await Animal.findByPk(req.params.id, {
+                include: [
+                    'animalImages',
+                    {
+                        model: Breed,
+                        as: 'breed',
+                        attributes: ['name']
+                    },
+                    {
+                        model: Institution,
+                        as: 'institution',
+                        attributes: ['name']
+                    },
+                    {
+                        model: User,
+                        as: 'adoptionUser',
+                        attributes: ['name']
+                    },
+                    {
+                        model: Color,
+                        as: 'color',
+                        attributes: ['name', 'class']
+                    },
+                    {
+                        model: BehavioralProfile,
+                        as: 'behavioralProfile',
+                        attributes: ['name']
+                    }
+                ],
+                attributes: {
+                    exclude: [
+                        'collectionPlace',
+                        'deathDate',
+                        'deathDetail',
+                        'adoptionSolictationDate',
+                        'forwardingDate',
+                    ]
+                }
+            });
+
+            if (entity) {
+                entity = await _mapAnimalImages(entity);
+                return res.status(200).json(entity);
+            }
+
+            return res.status(404).json({});
         }
         catch (error) {
             console.error(error);

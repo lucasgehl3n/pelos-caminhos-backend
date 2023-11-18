@@ -7,6 +7,7 @@ import BCrypt from 'bcryptjs';
 import moment from 'moment';
 import Interest from '../database/models/Interest';
 import { Op } from 'sequelize';
+import { AuthenticatedRequest } from '../..';
 const _mapCitiesToData = (req: Request) => {
     const formData = req.body;
 
@@ -44,9 +45,16 @@ const _mapInterestsToData = (req: Request) => {
 
 const _mapRequestToData = async (req: Request) => {
     const data = req.body as unknown as User;
-    const imageLogo = (req.files as Record<string, any>);
-    if (imageLogo && imageLogo.length > 0)
-        data.profileImage = imageLogo[0].buffer?.toString('base64');
+    const images = (req.files as Record<string, any>);
+   
+    const profileImage = images.find(
+        (file: Express.Multer.File) =>
+            file.fieldname == 'profileImage'
+    );
+
+    if (profileImage) {
+        data.profileImage = profileImage.buffer?.toString('base64');
+    }
     data.address = req.body.address as Address;
     data.address.id = null
 
@@ -112,6 +120,28 @@ export default class UserController {
                 attributes: ['name', 'profileImage', 'id', 'email', 'phone'],
             });
             res.status(200).json(entities);
+        }
+        catch (error) {
+            console.error(error);
+            return res.status(500).json(error).send();
+        }
+    }
+    public static async detailLoggedUser(req: Request, res: Response) {
+        try {
+            const AuthenticatedRequest = req as unknown as AuthenticatedRequest;
+            const entity = AuthenticatedRequest.user;
+            if (entity?.profileImage) {
+                const image = await Buffer.from(entity.profileImage, 'base64').toString('ascii');
+                if (image) {
+                    entity.profileImage = `data:image/png;base64,${image}`;
+                }
+            }
+            const entityJson = {
+                id: entity?.id,
+                name: entity?.name,
+                profileImage: entity?.profileImage,
+            }
+            res.status(200).json(entityJson);
         }
         catch (error) {
             console.error(error);

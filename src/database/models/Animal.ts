@@ -8,6 +8,7 @@ import AnimalImage from './AnimalImage';
 import TreatmentAnimal from './TreatmentAnimal';
 import AnimalAttachment from './AnimalAttachment';
 import AnimalPrediction from './AnimalPrediction';
+import Breed from './Breed';
 
 class Animal extends Model {
     public id!: number;
@@ -36,9 +37,11 @@ class Animal extends Model {
     public temporaryHome!: EntityTemporaryHome;
     public medicineAnimal!: MedicineAnimal[];
     public animalImages!: AnimalImage[];
+    public breed!: Breed;
     public animalAttachments!: AnimalAttachment[];
     public treatment!: TreatmentAnimal[];
     public predictions!: AnimalPrediction[];
+    public castrated!: boolean;
 }
 
 Animal.init(
@@ -111,6 +114,11 @@ Animal.init(
         idSituation: {
             type: DataTypes.INTEGER,
             allowNull: true,
+        },
+        castrated: {
+            type: DataTypes.BOOLEAN,
+            allowNull: true,
+            defaultValue: false,
         },
     },
     {
