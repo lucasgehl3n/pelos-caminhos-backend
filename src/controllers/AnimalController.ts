@@ -258,7 +258,7 @@ export default class AnimalController {
                                 listImages.push(blob);
                                 i++;
                             }
-                            await AnimalPredictionService
+                            AnimalPredictionService
                                 .generateAnimalPrediction(listImages, animal.id);
                         }
                     }
