@@ -24,32 +24,27 @@ class Application {
     }
 
     private _setMiddlewares(): void {
-        this.express.use(cors({
-            methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-            optionsSuccessStatus: 200,
+        const corsOptions = {
             credentials: true,
-        }));
+            origin: function (origin: any, callback: any) {
+                const allowedOrigins = ['http://localhost', 'http://localhost:3000', process.env.FRONTEND_URL];
 
-        this.express.use(function (req: any, res: any, next) {
-            res.header('Access-Control-Allow-Credentials', true);
+                if (!origin || allowedOrigins.includes(origin)) {
+                    callback(null, true);
+                } else {
+                    callback(new Error('Not allowed by CORS'));
+                }
+            },
+            methods: 'GET,PUT,POST,DELETE',
+            allowedHeaders: 'Origin, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version, X-Response-Time, X-PINGOTHER, X-CSRF-Token, Authorization',
+        };
 
-            const allowedOrigins = ['http://localhost', 'http://localhost:3000', process.env.FRONTEND_URL];
-            const origin = req.headers.origin;
-            if (allowedOrigins.includes(origin)) {
-                res.setHeader('Access-Control-Allow-Origin', origin);
-            }
+        this.express.use(cors(corsOptions));
 
-            res.header('Access-Control-Allow-Origin', req.headers.origin);
-            res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
-            res.header('Access-Control-Allow-Headers', 'Origin, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version, X-Response-Time, X-PINGOTHER, X-CSRF-Token,Authorization');
-
-            if (req.method === "OPTIONS") {
-                return res.status(200).end();
-            } else {
-                next();
-            }
-        });
+        // Middleware para lidar com preflight (solicitações OPTIONS)
+        this.express.options('*', cors(corsOptions));
         this.express.use(express.json());
+        
         this.express.use(express.urlencoded({ extended: true }));
         this.express.use(AuthenticationValidator);
     }
