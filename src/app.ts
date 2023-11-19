@@ -25,14 +25,19 @@ class Application {
 
     private _setMiddlewares(): void {
         this.express.use(cors({
-            origin: process.env.FRONTEND_URL,
-            credentials: true,
             methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
             optionsSuccessStatus: 200
         }));
 
         this.express.use(function (req: any, res: any, next) {
             res.header('Access-Control-Allow-Credentials', true);
+
+            const allowedOrigins = ['http://localhost', 'http://localhost:3000', process.env.FRONTEND_URL];
+            const origin = req.headers.origin;
+            if (allowedOrigins.includes(origin)) {
+                res.setHeader('Access-Control-Allow-Origin', origin);
+            }
+
             res.header('Access-Control-Allow-Origin', req.headers.origin);
             res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
             res.header('Access-Control-Allow-Headers', 'Origin, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version, X-Response-Time, X-PINGOTHER, X-CSRF-Token,Authorization');
