@@ -23,7 +23,7 @@ class AnimalPredictionService extends BaseService<AnimalPrediction>{
                 const breed = await BreedService.getBreedByAITag(predictionViewList[i].breed);
                 if (breed && breed.id) {
                     let animals = await this.GetAnimalsByBreedPrediction(breed.id);
-                    animals = animals.filter(x => x.predictions.find(x => x.idBreed == breed.id)?.percentage || 0 > 0.15);
+                    animals = animals.filter(x => (x.predictions.find(x => x.idBreed == breed.id)?.percentage || 0) > 0.15);
                     const view = new AnimalView();
                     view.breed = breed;
                     view.animalList = animals.filter(x => !listAnimals.includes(x.id));
