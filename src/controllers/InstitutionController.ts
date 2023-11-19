@@ -147,7 +147,7 @@ class InstitutionController {
                 UserRoleService.GenerateUserServiceToInstitution(authenticatedRequest.user!, institution);
             }
 
-            return res.status(200).send({ id: institution?.id});
+            return res.status(200).send({ id: institution?.id });
         }
         catch (error) {
             console.error(error);
@@ -235,6 +235,8 @@ class InstitutionController {
                 const institutionViewList: Object[] = [];
                 for (let i = 0; i < entities.length; i++) {
                     entities[i] = await _mapInstitutionImage(entities[i]);
+                    if (entities[i].description && entities[i].description.length > 100)
+                        entities[i].description = entities[i].description.substring(0, 100) + "...";
                     const entityView = entities[i];
                     _mapRolesSearch(entityView, userRoles, institutionViewList);
                 }
