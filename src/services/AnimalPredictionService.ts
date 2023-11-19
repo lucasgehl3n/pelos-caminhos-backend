@@ -4,7 +4,6 @@ import Animal from "../database/models/Animal";
 import AnimalPrediction from "../database/models/AnimalPrediction";
 import AnimalPredictionView from "../views/AnimalPredictionView";
 import AnimalView from "../views/AnimalView";
-import AnimalService from "./AnimalService";
 import BaseService from "./BaseService";
 import BreedService from "./BreedService";
 class AnimalPredictionService extends BaseService<AnimalPrediction>{

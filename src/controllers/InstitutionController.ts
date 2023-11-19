@@ -11,6 +11,7 @@ import { Roles } from "../enums/Roles";
 import UserRole from "../database/models/UserRole";
 import InstitutionFilters from "../filters/InstitutionFilters";
 import { Op } from "sequelize";
+import User from "../database/models/User";
 
 const _mapGalleryToData = (req: Request, images: Record<string, any>) => {
     const publicImages = images.filter(
@@ -161,6 +162,11 @@ class InstitutionController {
                 include: [
                     'address',
                     'publicImages',
+                    {
+                        model: User,
+                        as: 'userCreator',
+                        attributes: ['name'],
+                    },
                 ],
                 attributes: {
                     exclude: [

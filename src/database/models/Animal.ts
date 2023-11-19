@@ -80,7 +80,7 @@ Animal.init(
             allowNull: true,
         },
         weight: {
-            type: DataTypes.INTEGER,
+            type: DataTypes.FLOAT,
             allowNull: true,
         },
         deathDate: {
