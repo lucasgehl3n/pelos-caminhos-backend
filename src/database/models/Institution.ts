@@ -13,6 +13,7 @@ class Institution extends Model {
     public site?: string;
     public email?: string;
     public image?: string | null;
+    public howVolunteersCanHelp?: string | null;
     public receive_volunteers!: string;
     public adress!: Address
     public idAddress!: number
@@ -59,6 +60,10 @@ Institution.init(
             type: DataTypes.BOOLEAN,
             allowNull: false,
             defaultValue: true,
+        },
+        howVolunteersCanHelp: {
+            type: DataTypes.STRING(5000),
+            allowNull: true,
         },
         idUserCreator: {
             type: DataTypes.INTEGER,
