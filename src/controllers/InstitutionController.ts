@@ -48,6 +48,10 @@ const _mapRequestToData = async (req: Request) => {
         data.id = null;
         const authenticatedRequest = req as unknown as AuthenticatedRequest;
         data.idUserCreator = authenticatedRequest.user!.id;
+
+        if (data.adress) {
+            data.adress.id = null;
+        }
     }
 
     if (logoImage) {

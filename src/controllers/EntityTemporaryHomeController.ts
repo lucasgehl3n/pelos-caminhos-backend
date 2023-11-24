@@ -74,9 +74,7 @@ export default class EntityTemporaryHomeController {
     }
     public static async save(req: Request, res: Response) {
         try {
-            console.log('s');
             const mapModel = await _mapRequestToData(req);
-            console.log(mapModel);
             if (!this.validateRoles(req, mapModel)) {
                 return res.status(403).send();
             }
