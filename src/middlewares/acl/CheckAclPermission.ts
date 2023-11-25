@@ -7,7 +7,12 @@ export default function CheckAclPermission(role: Roles) {
     return function (req: Request, res: Response, next: NextFunction) {
         const authenticatedRequest = req as unknown as AuthenticatedRequest;
         const { userRoles } = authenticatedRequest.user!;
-        const id = req.params.id || req.body.id;
+        let id = req.params.id || req.body.id;
+        
+        if(!req.path.includes('/institution')){
+            id = req.params.idInstitution || req.body.idInstitution;
+        }
+
         if (userRoles.some(x => 
                 x.idRole && x.idRole >= role && 
                 x.idInstitution?.toString() === id

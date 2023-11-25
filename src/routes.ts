@@ -98,14 +98,16 @@ routes.post('/animal/save', upload.any(), (req, res) => {
 });
 
 routes.post('/animal/saveFiles', upload.any(), (req, res) => {
+    CheckUserPermission(Roles.Volunteer)
     return AnimalController.saveFiles(req, res)
 });
 
 routes.post('/temporaryHome/save', (req, res) => {
+    CheckUserPermission(Roles.Volunteer)
     return EntityTemporaryHomeController.save(req, res)
 });
 
-routes.get('/animal/:id', (req, res) => {
+routes.get('/animal/:id', CheckUserPermission(Roles.Volunteer), (req, res) => {
     return AnimalController.detail(req, res)
 });
 
