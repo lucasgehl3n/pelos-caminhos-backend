@@ -11,11 +11,9 @@ export default function CheckAclAnimalsPermission(role: Roles) {
         const id = req.params.id || req.body.id;
     
         const animal = await Animal.findByPk(id);
-        console.log(animal)
-        console.log(userRoles)
         if (userRoles.some(x => 
                 x.idRole && x.idRole >= role && 
-                x.idInstitution?.toString() === animal?.idInstitution
+                x.idInstitution === animal?.idInstitution
             )) {
             return next();
         }
