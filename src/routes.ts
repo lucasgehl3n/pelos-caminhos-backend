@@ -13,6 +13,7 @@ import BreedController from "./controllers/BreedController";
 import ColorController from "./controllers/ColorController";
 import BehavioralProfileController from "./controllers/BehavioralProfileController";
 import AnimalController from "./controllers/AnimalController";
+import CheckAclAnimalsPermission from "./middlewares/acl/CheckAclAnimalsPermission";
 const routes = Router();
 
 const globalErrorHandler = (err: Error, req: Request, res: Response, next: NextFunction) => {
@@ -98,16 +99,16 @@ routes.post('/animal/save', upload.any(), (req, res) => {
 });
 
 routes.post('/animal/saveFiles', upload.any(), (req, res) => {
-    CheckUserPermission(Roles.Volunteer)
+    CheckAclAnimalsPermission(Roles.Volunteer)
     return AnimalController.saveFiles(req, res)
 });
 
 routes.post('/temporaryHome/save', (req, res) => {
-    CheckUserPermission(Roles.Volunteer)
+    CheckAclAnimalsPermission(Roles.Volunteer)
     return EntityTemporaryHomeController.save(req, res)
 });
 
-routes.get('/animal/:id', CheckUserPermission(Roles.Volunteer), (req, res) => {
+routes.get('/animal/:id', CheckAclAnimalsPermission(Roles.Volunteer), (req, res) => {
     return AnimalController.detail(req, res)
 });
 
