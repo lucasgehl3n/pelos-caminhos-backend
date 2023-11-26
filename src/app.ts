@@ -44,7 +44,7 @@ class Application {
         // Middleware para lidar com preflight (solicitações OPTIONS)
         this.express.options('*', cors(corsOptions));
         this.express.use(express.json());
-        
+
         this.express.use(express.urlencoded({ extended: true }));
         this.express.use(AuthenticationValidator);
     }
@@ -69,6 +69,9 @@ class Application {
         this.express.use(flash())
         this.express.use(passport.initialize());
         this.express.use(passport.session());
+        this.express.use(express.json({ limit: '50mb' }));
+        this.express.use(express.urlencoded({ limit: '50mb' }));
+
         PassportManager.InitAuthenticateMethods();
     }
 }
