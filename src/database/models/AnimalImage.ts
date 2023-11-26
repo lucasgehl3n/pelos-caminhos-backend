@@ -5,7 +5,7 @@ import Animal from "./Animal";
 class AnimalImage extends Model {
     public id!: number | null;
     public description!: string;
-    public image!: string;
+    public image!: Buffer | string;
     public type!: string;
     public idAnimal!: number;
     public animal!: Animal;

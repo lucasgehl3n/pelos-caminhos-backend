@@ -18,8 +18,8 @@ class Animal extends Model {
     public gender!: number;
     public collectionDate!: Date;
     public collectionPlace!: string;
-    public age!: number;
-    public weight!: number;
+    public age?: number;
+    public weight?: number;
     public deathDate!: Date;
     public deathDetail!: string;
     public idBreed!: number;

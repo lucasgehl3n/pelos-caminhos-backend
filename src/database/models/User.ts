@@ -13,7 +13,7 @@ class User extends Model {
     public encriptedPassword!: string;
     public birthdayDate!: Date;
     public phone!: string;
-    public profileImage!: string | null;
+    public profileImage!: string | null | Buffer;
     public address!: Address;
     public userRoles!: UserRole[];
     public cities!: InterestCity[];

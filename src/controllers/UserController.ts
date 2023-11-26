@@ -8,6 +8,7 @@ import moment from 'moment';
 import Interest from '../database/models/Interest';
 import { Op } from 'sequelize';
 import { AuthenticatedRequest } from '../..';
+import sharp from 'sharp';
 const _mapCitiesToData = (req: Request) => {
     const formData = req.body;
 
@@ -43,6 +44,14 @@ const _mapInterestsToData = (req: Request) => {
     return interestsArray;
 }
 
+
+const compressImage = async (imageBuffer: Buffer): Promise<Buffer> => {
+    return await sharp(imageBuffer)
+        .jpeg({ quality: 70 })
+        .png({ quality: 70 })
+        .toBuffer();
+};
+
 const _mapRequestToData = async (req: Request) => {
     const data = req.body as unknown as User;
     const images = (req.files as Record<string, any>);
@@ -53,7 +62,8 @@ const _mapRequestToData = async (req: Request) => {
     );
 
     if (profileImage) {
-        data.profileImage = profileImage.buffer?.toString('base64');
+        const compressedBuffer = await compressImage(profileImage.buffer);
+        data.profileImage = compressedBuffer;
     }
     data.address = req.body.address as Address;
     data.address.id = null
@@ -131,7 +141,7 @@ export default class UserController {
             const AuthenticatedRequest = req as unknown as AuthenticatedRequest;
             const entity = AuthenticatedRequest.user;
             if (entity?.profileImage) {
-                const image = await Buffer.from(entity.profileImage, 'base64').toString('ascii');
+                const image = await Buffer.from(entity.profileImage as string, 'base64').toString('ascii');
                 if (image) {
                     entity.profileImage = `data:image/png;base64,${image}`;
                 }

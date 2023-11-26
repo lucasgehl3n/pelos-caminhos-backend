@@ -15,7 +15,30 @@ const _bondedFilters = (userRoles: UserRole[], searchFilter: any) => {
                 as: 'institution',
                 where: {
                     id: {
-                        [Op.in]: [userRoles.map(ur => ur.idInstitution)]
+                        [Op.in]: [...userRoles.map(ur => ur.idInstitution)]
+                    }
+                },
+            },
+            {
+                model: AnimalImage,
+                as: 'animalImages',
+                separate: true, // Isso garantirá que apenas a primeira imagem seja incluída
+                limit: 1, // Limita o número de imagens incluídas para cada animal a 1
+            },
+        ],
+    }
+}
+
+const _notBondedFilters = (userRoles: UserRole[], searchFilter: any) => {
+    return {
+        ...searchFilter,
+        include: [
+            {
+                model: Institution,
+                as: 'institution',
+                where: {
+                    id: {
+                        [Op.notIn]: [...userRoles.map(ur => ur.idInstitution)]
                     }
                 },
             },
@@ -59,12 +82,17 @@ export default class AnimalFilters {
     static ApplyFilters = (req: Request) => {
         const authenticatedRequest = req as unknown as AuthenticatedRequest;
         const bonded = req.query.bonded || false;
+        const notBonded = req.query.notBonded || false;
         let searchFilter = _getSearchFilters(req) as any;
 
         const { userRoles } = (req as unknown as AuthenticatedRequest).user!;
 
         if (bonded) {
             searchFilter = _bondedFilters(userRoles, searchFilter);
+        }
+
+        if (notBonded) {
+            searchFilter = _notBondedFilters(userRoles, searchFilter);
         }
 
 

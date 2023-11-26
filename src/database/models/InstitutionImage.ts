@@ -4,7 +4,7 @@ import Institution from './Institution';
 
 class InstitutionImage extends Model {
     public id!: number | null; 
-    public image?: string | null;
+    public image?: string | Buffer | null;
     public description?: string;
     public idInstitution!: number | null;
 }

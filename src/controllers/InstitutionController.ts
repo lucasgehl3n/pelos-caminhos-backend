@@ -12,8 +12,9 @@ import UserRole from "../database/models/UserRole";
 import InstitutionFilters from "../filters/InstitutionFilters";
 import { Op } from "sequelize";
 import User from "../database/models/User";
+import sharp from "sharp";
 
-const _mapGalleryToData = (req: Request, images: Record<string, any>) => {
+const _mapGalleryToData = async (req: Request, images: Record<string, any>) => {
     const publicImages = images.filter(
         (file: Express.Multer.File) =>
             file.fieldname.includes('publicImages')
@@ -24,8 +25,8 @@ const _mapGalleryToData = (req: Request, images: Record<string, any>) => {
         const imageObject = new InstitutionImage();
         const id = req.body[`publicImages[${i}].id`]
         imageObject.id = id != 0 ? id : null;
-        const image = publicImages[i].buffer;
-        imageObject.image = image.toString('base64');
+        const compressedBuffer = await compressImage(publicImages[i].buffer);
+        imageObject.image = compressedBuffer;
         imagesConfig.push(imageObject);
     }
 
@@ -35,7 +36,7 @@ const _mapGalleryToData = (req: Request, images: Record<string, any>) => {
 const _mapRequestToData = async (req: Request) => {
     const data = req.body as unknown as Institution;
     const images = (req.files as Record<string, any>);
-    const imagesConfig = _mapGalleryToData(req, images);
+    const imagesConfig = await _mapGalleryToData(req, images);
     data.publicImages = [...imagesConfig];
     data.adress = req.body.address as Address;
 
@@ -55,7 +56,8 @@ const _mapRequestToData = async (req: Request) => {
     }
 
     if (logoImage) {
-        data.image = logoImage.buffer?.toString('base64');
+        const compressedBuffer = await compressImage(logoImage.buffer);
+        data.image = compressedBuffer.toString('base64');
     }
 
     return data;
@@ -73,14 +75,14 @@ const _mapInstitutionImage = async (entity: Institution) => {
 
 const _mapPublicImages = async (entity: Institution) => {
     if (entity.publicImages) {
-        await entity.publicImages.forEach(async (image: InstitutionImage) => {
+        await Promise.all(entity.publicImages.map(async (image: InstitutionImage) => {
             if (image.image) {
-                const imageBase64 = await Buffer.from(image.image, 'base64').toString('ascii');
+                const imageBase64 = await Buffer.from(image.image as string, 'base64').toString('base64');
                 if (imageBase64) {
                     image.image = `data:image/png;base64,${imageBase64}`;
                 }
             }
-        });
+        }));
     }
     return entity;
 };
@@ -137,6 +139,13 @@ const sortingOptions: SortingOptions = {
     'name-za': [['name', 'DESC']],
     'latest': [['createdAt', 'DESC']],
     'old': [['createdAt', 'ASC']],
+};
+
+const compressImage = async (imageBuffer: Buffer): Promise<Buffer> => {
+    return await sharp(imageBuffer)
+        .jpeg({ quality: 70 })
+        .png({ quality: 70 })
+        .toBuffer();
 };
 
 class InstitutionController {

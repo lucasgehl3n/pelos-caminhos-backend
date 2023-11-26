@@ -19,6 +19,7 @@ import Color from "../database/models/Color";
 import BehavioralProfile from "../database/models/BehavioralProfile";
 import UserRole from "../database/models/UserRole";
 import { Roles } from "../enums/Roles";
+import sharp from "sharp";
 const _mapRequestToData = async (req: Request) => {
     let data = req.body as unknown as Animal;
     data = mapData(data);
@@ -68,8 +69,14 @@ const mapData = (data: any) => {
     return data;
 }
 
+const compressImage = async (imageBuffer: Buffer): Promise<Buffer> => {
+    return await sharp(imageBuffer)
+        .jpeg({ quality: 70 })
+        .png({ quality: 70 })
+        .toBuffer();
+};
 
-const _mapGalleryToData = (req: Request, images: Record<string, any>) => {
+const _mapGalleryToData = async (req: Request, images: Record<string, any>) => {
     const animalImages = images.filter(
         (file: Express.Multer.File) =>
             file.fieldname.includes('animalImages')
@@ -82,7 +89,10 @@ const _mapGalleryToData = (req: Request, images: Record<string, any>) => {
         const id = req.body[`animalImages[${i}].id`]
         imageObject.id = id != 0 ? id : null;
         imageObject.idAnimal = idAnimal;
-        imageObject.image = animalImages[i].buffer;
+
+        const compressedBuffer = await compressImage(animalImages[i].buffer);
+        imageObject.image = compressedBuffer;
+
         imagesConfig.push(imageObject);
         const originalname = animalImages[i].originalname;
         const fileExtension = originalname.split('.').pop();
@@ -240,7 +250,7 @@ export default class AnimalController {
 
                 const images = (req.files as Record<string, any>);
                 if (images && images.length > 0) {
-                    animal.animalImages = _mapGalleryToData(req, images);
+                    animal.animalImages = await _mapGalleryToData(req, images);
                     animal.animalAttachments = _mapAnimalAttachmentToData(req, images);
                 }
 
