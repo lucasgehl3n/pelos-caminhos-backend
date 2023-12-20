@@ -5,7 +5,7 @@ Hello. I'm delighted that you've discovered my project. "Pelos Caminhos" is pres
 
 It features backend permission systems with ACL implementation, public and private pages, animal registration and management, a public profile that can be shared using a QR code. It also includes an administration area for NGOs and visualization of existing animals.
 
-The software includes a feature for animal recognition based on breed identification, utilizing the [Dog Breed Classification](https://github.com/stormy-ua/dog-breeds-classification) project as a foundation.
+The software includes a feature for animal recognition based on breed identification, utilizing the [Dog Breed Classification](https://github.com/stormy-ua/dog-breeds-classification) project as a foundation. Access the [image recognition container here](https://hub.docker.com/repository/docker/lucasgehl3n/pelos_caminhos_classification_ai/general) (Docker installation required).
 
 The architecture can be viewed [here](https://drive.google.com/file/d/1fjh1XuPdnr3KRJ3xh2vTvBD_iZ-qgDKM/view?usp=sharing).
 
@@ -42,6 +42,12 @@ Or alternatively, in production:
 
 [Click here to access](https://github.com/lucasgehl3n/pelos-caminhos-frontend)
 
+## Pictures
+![dog](https://i.ibb.co/MBsRmmd/Screenshot-1.png=1366x768)
+![list animals](https://i.ibb.co/NsF36cQ/17-3.png=1366x768)
+![register](https://i.ibb.co/d6qbMqF/1-1.png=1366x768)
+
+
 # [Português] Pelos Caminhos - Backend
 Olá. Fico feliz que tenha encontrado o meu projeto. O "Pelos Caminhos" é um projeto apresentado como Trabalho de Conclusão de Curso no Curso de Ciência da Computação na Universidade de Caxias do Sul (UCS). Ele tem o objetivo de ser uma plataforma que mescla três perfis: o usuário adotante, o administrador de instituições e os voluntários. O trabalho completo pode ser lido [neste link](https://drive.google.com/file/d/1wGspejLclOVXlhErvAr8gK0-ASYVHKiR/view?usp=sharing). 
 
@@ -49,7 +55,7 @@ Olá. Fico feliz que tenha encontrado o meu projeto. O "Pelos Caminhos" é um pr
 Ele conta com recursos como sistemas de permissões back-end com implementação de ACL, páginas públicas e privadas, cadastro e gerenciamento de animais, perfil público que pode ser compartilhado utilizando um QRCode. Conta também com a área para administração da ONG e visualização de animais existentes.
  
 
-O software conta com um recurso para reconhecimento de animais a partir da identificação de raças, que utiliza como base o projeto [Dog Breed Classification](https://github.com/stormy-ua/dog-breeds-classification).
+O software conta com um recurso para reconhecimento de animais a partir da identificação de raças, que utiliza como base o projeto [Dog Breed Classification](https://github.com/stormy-ua/dog-breeds-classification). Acesse aqui o [container para reconhecimento de imagem](https://hub.docker.com/repository/docker/lucasgehl3n/pelos_caminhos_classification_ai/general) (Necessário ter docker instalado).
   
 A arquitetura pode ser visualizada [neste link](https://drive.google.com/file/d/1fjh1XuPdnr3KRJ3xh2vTvBD_iZ-qgDKM/view?usp=sharing).
 
